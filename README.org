@@ -3,11 +3,18 @@
 #+export_file_name: index
 #+setupfile: ~/.emacs.d/org-templates/projects.org
 
+* NoledgeBin Team
+
+- [[https://github.com/joel122002][Joel]]
+- [[https://github.com/karishmarajput][Karishma]]
+- [[https://github.com/andinus][Andinus]]
+- [[https://github.com/Pauloper1][Paul]]
+
 * License
 
 #+begin_src
 NoledgeBin - NoledgeBin is a zero-knowledge pastebin
-Copyright (C) 2021, Andinus <andinus@nand.sh>
+Copyright (C) 2021, NoledgeBin Team
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
