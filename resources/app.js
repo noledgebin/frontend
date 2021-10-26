@@ -1,15 +1,36 @@
 'use strict';
 
+import * as fflate from 'fflate';
 import * as CryptoJS from 'crypto-js';
 
-window.send = function send() {
+window.sendPaste = function sendPaste() {
+    const passphrase = 'secret-key';
+
     const paste = document.getElementById("user-paste").innerText;
-    console.log(paste);
+    console.log("Paste", paste);
 
-    const ciphertext = CryptoJS.AES.encrypt(paste, 'secret-key').toString();
-    console.log(ciphertext);
+    // Increasing mem may increase performance at the cost of memory.
+    // The mem ranges from 0 to 12, where 4 is the default.
+    const buf = fflate.strToU8(paste);
+    const compressedPaste = fflate.compressSync(buf, { level: 6, mem: 8 });
+    console.log("Compressed", compressedPaste);
 
-    let bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret-key');
-    let originalText = bytes.toString(CryptoJS.enc.Utf8);
-    console.log(originalText);
+    // Convert compressedPaste to string before encrypting it.
+    const encryptedText = CryptoJS.AES.encrypt(
+        compressedPaste.toString(), passphrase
+    ).toString();
+    console.log("Encrypted", encryptedText);
+
+    // Get originalText by converting the decrypted string to Array.
+    // Then we convert the strings in Array to Number with map, then
+    // convert it to Uint8Array.
+    const bytes  = CryptoJS.AES.decrypt(encryptedText, passphrase);
+    const originalText = Uint8Array.from(
+        bytes.toString(CryptoJS.enc.Utf8).split(',').map(Number)
+    );
+    console.log("Decrypted", originalText);
+
+    const decompressed = fflate.decompressSync(originalText);
+    const outPaste = fflate.strFromU8(decompressed);
+    console.log("Decompressed", outPaste);
 }
