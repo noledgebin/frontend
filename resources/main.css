@@ -1,66 +1,66 @@
 :root {
-  --bg-main: #ffffff;
-  --bg-dim: #f8f8f8;
-  --bg-alt: #f0f0f0;
+    --bg-main: #ffffff;
+    --bg-dim: #f8f8f8;
+    --bg-alt: #f0f0f0;
 
-  --blue-subtle-bg: #b5d0ff;
-  --cyan-subtle-bg: #c0efff;
-  --bg-hl-alt-intense: #e8dfd1;
+    --blue-subtle-bg: #b5d0ff;
+    --cyan-subtle-bg: #c0efff;
+    --bg-hl-alt-intense: #e8dfd1;
 
-  --fg-main: #000000;
-  --fg-dim: #282828;
-  --fg-alt: #505050;
+    --fg-main: #000000;
+    --fg-dim: #282828;
+    --fg-alt: #505050;
 
-  --fg-special-cold: #093060;
-  --fg-special-mild: #184034;
-  --fg-special-warm: #5d3026;
-  --fg-special-calm: #61284f;
+    --fg-special-cold: #093060;
+    --fg-special-mild: #184034;
+    --fg-special-warm: #5d3026;
+    --fg-special-calm: #61284f;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg-main: #000000;
-    --bg-dim: #100f10; /* #110b11 */
-    --bg-alt: #191a1b; /* #181a20 */
+    :root {
+        --bg-main: #000000;
+        --bg-dim: #100f10; /* #110b11 */
+        --bg-alt: #191a1b; /* #181a20 */
 
-    --blue-subtle-bg: #10387c;
-    --cyan-subtle-bg: #00415e;
-    --bg-hl-alt-intense: #282e46;
+        --blue-subtle-bg: #10387c;
+        --cyan-subtle-bg: #00415e;
+        --bg-hl-alt-intense: #282e46;
 
-    --fg-main: #ffffff;
-    --fg-dim: #e0e6f0;
-    --fg-alt: #a8a8a8;
+        --fg-main: #ffffff;
+        --fg-dim: #e0e6f0;
+        --fg-alt: #a8a8a8;
 
-    --fg-special-cold: #c6eaff;
-    --fg-special-mild: #bfebe0;
-    --fg-special-warm: #f8dec0;
-    --fg-special-calm: #fbd6f4;
-  }
+        --fg-special-cold: #c6eaff;
+        --fg-special-mild: #bfebe0;
+        --fg-special-warm: #f8dec0;
+        --fg-special-calm: #fbd6f4;
+    }
 }
 
 html {
-  color: var(--fg-main);
-  background-color: var(--bg-main);
+    color: var(--fg-main);
+    background-color: var(--bg-main);
 }
 
 .paste-box-wrapper {
-  width: 75vw;
-  margin-left: auto;
-  margin-right: auto;
+    width: 75vw;
+    margin-left: auto;
+    margin-right: auto;
 }
 .paste-box {
-  padding: 2ch;
-  min-height: 50vh;
-  background: var(--bg-alt);
-  border: 1px solid var(--bg-hl-alt-intense);
-  overflow-wrap: anywhere;
+    padding: 2ch;
+    min-height: 50vh;
+    background: var(--bg-alt);
+    border: 1px solid var(--bg-hl-alt-intense);
+    overflow-wrap: anywhere;
 }
 
 .button {
-  outline: none;
-  background: var(--blue-subtle-bg);
-  color: var(--fg-special-cold);
-  padding: 10px 20px;
-  border: 1px solid var(--bg-dim);
-  margin-top: 20px;
-  float: right;
+    outline: none;
+    background: var(--blue-subtle-bg);
+    color: var(--fg-special-cold);
+    padding: 10px 20px;
+    border: 1px solid var(--bg-dim);
+    margin-top: 20px;
+    float: right;
 }

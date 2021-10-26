@@ -3,24 +3,22 @@
 #+export_file_name: index
 #+setupfile: ~/.emacs.d/org-templates/projects.org
 
-* NoledgeBin Team
-
-- [[https://github.com/joel122002][Joel]]
-- [[https://github.com/karishmarajput][Karishma]]
-- [[https://github.com/andinus][Andinus]]
-- [[https://github.com/Pauloper1][Paul]]
-
-* Development
+* Installation
 
 #+begin_src sh
-npm install crypto-js # install dependency
+# Clone the project.
+git clone https://git.tilde.institute/noledgebin/frontend
+cd frontend
+
+npm install # Get dependencies.
+npm run dev # Build for development
 #+end_src
 
 * License
 
 #+begin_src
 NoledgeBin - NoledgeBin is a zero-knowledge pastebin
-Copyright (C) 2021, NoledgeBin Team
+Copyright (C) 2021, NoledgeBin AUTHORS
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
