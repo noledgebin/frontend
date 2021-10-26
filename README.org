@@ -11,7 +11,8 @@ git clone https://git.tilde.institute/noledgebin/frontend
 cd frontend
 
 npm install # Get dependencies.
-npm run dev # Build for development
+npm run dev # Build for development.
+npm run build # Build for deployment.
 #+end_src
 
 * License
