@@ -10,6 +10,12 @@
 - [[https://github.com/andinus][Andinus]]
 - [[https://github.com/Pauloper1][Paul]]
 
+* Development
+
+#+begin_src sh
+npm install crypto-js # install dependency
+#+end_src
+
 * License
 
 #+begin_src
