@@ -7,7 +7,7 @@
 
 #+begin_src sh
 # Clone the project.
-git clone https://git.tilde.institute/noledgebin/frontend
+git clone https://github.com/noledgebin/frontend
 cd frontend
 
 npm install # Get dependencies.
