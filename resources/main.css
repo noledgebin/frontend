@@ -1,0 +1,21 @@
+.paste-box-wrapper {
+    width: 75vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+.paste-box {
+    min-height: 50vh;
+    border-style: solid;
+    border-radius: 10px;
+}
+
+.button {
+    outline: none;
+    border: none;
+    background: slategray;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    float: right;
+}
