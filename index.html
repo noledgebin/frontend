@@ -5,15 +5,43 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>NoledgeBin</title>
         <!-- <link rel="icon" href="./resources/favicon.png" type="image/png"> -->
-        <link rel="stylesheet" href="./resources/main.css">
+        <link rel="stylesheet" href="./resources/style.css">
     </head>
     <body>
         <noscript>
             JavaScript required.
         </noscript>
-        <div class="paste-box-wrapper">
-            <div id="user-paste" class="paste-box" contenteditable="true"></div>
-            <button id="send-button" class="button send" onclick="sendPaste();">Send</button>
+
+        <div class="sidebar">
+            <div class="header">
+                NoledgeBin
+                <label id="ham-label" for="hamburger">&#9776;</label>
+            </div>
+            <input type="checkbox" id="hamburger"/>
+
+            <div class="bottom" id="hamitems">
+                <div class="expires">
+                    <label for="expiry-time">Expires: </label>
+                    <select name="expires-time" id="expires-time">
+                        <option value="never">Never</option>
+                        <option value="5min">5 minutes</option>
+                        <option value="10min">10 minutes</option>
+                        <option value="1hr">1 hour</option>
+                        <option value="1day">1 day</option>
+                        <option value="1week">1 week</option>
+                        <option value="1mon">1 month</option>
+                        <option value="1yr">1 year</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="wrapper">
+            <div class="paste-box-wrapper">
+                <div id="user-paste" class="paste-box" contenteditable="true"></div>
+                <button onclick="sendPaste();">Send</button>
+            </div>
         </div>
 
         <script type="text/javascript" src="./resources/app.js"></script>
