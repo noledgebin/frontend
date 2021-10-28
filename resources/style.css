@@ -1,0 +1,181 @@
+/* Colors ********************************************************************/
+
+:root {
+    --bg-main: #ffffff;
+    --bg-dim: #f8f8f8;
+    --bg-alt: #f0f0f0;
+
+    --blue-subtle-bg: #b5d0ff;
+    --cyan-subtle-bg: #c0efff;
+    --bg-hl-alt-intense: #e8dfd1;
+
+    --fg-main: #000000;
+    --fg-dim: #282828;
+    --fg-alt: #505050;
+
+    --fg-special-cold: #093060;
+    --fg-special-mild: #184034;
+    --fg-special-warm: #5d3026;
+    --fg-special-calm: #61284f;
+
+    --red: #a60000;
+    --green: #005e00;
+    --yellow: #813e00;
+    --blue: #0031a9;
+    --magenta: #721045;
+    --cyan: #00538b;
+
+    --blue-alt-other: #0000c0;
+    --yellow-nuanced-fg: #3f3000;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-main: #000000;
+        --bg-dim: #100f10; /* #110b11 */
+        --bg-alt: #191a1b; /* #181a20 */
+
+        --blue-subtle-bg: #10387c;
+        --cyan-subtle-bg: #00415e;
+        --bg-hl-alt-intense: #282e46;
+
+        --fg-main: #ffffff;
+        --fg-dim: #e0e6f0;
+        --fg-alt: #a8a8a8;
+
+        --fg-special-cold: #c6eaff;
+        --fg-special-mild: #bfebe0;
+        --fg-special-warm: #f8dec0;
+        --fg-special-calm: #fbd6f4;
+
+        --red: #ff8059;
+        --green: #44bc44;
+        --yellow: #eecc00;
+        --blue: #2fafff;
+        --magenta: #feacd0;
+        --cyan: #00d3d0;
+
+        --blue-alt-other: #00bcff;
+        --yellow-nuanced-fg: #dfdfb0;
+
+    }
+}
+
+::selection { background-color: var(--bg-hl-alt-intense); }
+
+html {
+    color: var(--fg-main);
+    background-color: var(--bg-main);
+    box-sizing: border-box;
+}
+*, *:before, *:after { box-sizing: inherit; }
+
+body { line-height: 1.5; }
+
+/* Sidebar *******************************************************************/
+
+.sidebar {
+    background-color: var(--bg-dim);
+    margin: 0.4em;
+    box-shadow: var(--bg-hl-alt-intense) 4px 4px 2px;
+}
+.wrapper {
+    padding: 1ch;
+}
+@media screen and (min-width: 48em) {
+    .sidebar {
+        height: 100%;
+        width: 16em;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        overflow-x: hidden;
+    }
+    .sidebar .bottom {
+        position: absolute;
+        bottom: 2ch;
+        width: 100%;
+    }
+    .wrapper {
+        margin-left: 16.8em;
+    }
+}
+
+/* Sidebar navigation ********************************************************/
+
+#hamitems { text-align: center; }
+.sidebar #ham-label, #hamburger { display: none; }
+
+@media screen and (max-width: 48em) {
+    .sidebar #ham-label {
+        display: inline-block;
+        color: var(--fg-main);
+        background: var(--cyan-subtle-bg);
+        font-size: 1.2em;
+        text-align: center;
+        float: right;
+        padding: 0 2ch;
+    }
+
+    #hamitems { display: none; }
+    .sidebar input:checked ~ #hamitems { display: block; }
+}
+
+.sidebar h1 { text-align: center; }
+
+.sidebar .expires {
+    background-color: var(--bg-main);
+    color: var(--fg-special-mild);
+    width: 100%;
+    padding: 10px;
+}
+
+.sidebar select {
+    background-color: var(--bg-main);
+    color: var(--fg-special-mild);
+    border: 0;
+    min-width: 50%;
+}
+
+.sidebar .header {
+    font-size: 2rem;
+    padding: 0.2ch 1ch;
+}
+.sidebar .header label {
+    font-size: 1.6rem !important;
+    margin-top: 0.32ch;
+}
+
+/* General Styles ************************************************************/
+
+hr { color: var(--fg-alt); }
+
+a { color: var(--blue-alt-other); }
+a:hover, a:focus {
+    color: var(--fg-dim);
+    background-color: var(--blue-subtle-bg);
+}
+a:visited { color: var(--cyan); }
+a:visited:hover, a:visited:focus {
+    color: var(--fg-dim);
+    background-color: var(--cyan-subtle-bg);
+}
+
+/* Paste box *****************************************************************/
+
+.paste-box-wrapper .paste-box {
+    padding: 1ch;
+    min-height: 50vh;
+    background-color: var(--bg-alt);
+    border: 1px solid var(--bg-hl-alt-intense);
+    overflow-wrap: anywhere;
+}
+
+.paste-box-wrapper button {
+    background-color: var(--blue-subtle-bg);
+    color: var(--fg-main);
+    padding: 0.8em 1.6em;
+    border: 1px solid var(--fg-alt);
+    margin-top: 20px;
+    float: right;
+}
