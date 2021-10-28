@@ -74,7 +74,22 @@ function initialize() {
         const passphrase = fragment[1];
 
         const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
-        let paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+        // Adds backwards compatibility. If the paste is not JSON then
+        // we assume that the URL was generated before we moved on to
+        // using Objects so we create one before proceeding.
+        let paste;
+        try {
+            paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        } catch (e) {
+            if (e instanceof SyntaxError)
+                paste = {
+                    "text": bytes.toString(CryptoJS.enc.Utf8),
+                    "compressed": true
+                };
+            else
+                throw e;
+        }
 
         if (paste.compressed) {
             // Get originalText by converting the decrypted string to
