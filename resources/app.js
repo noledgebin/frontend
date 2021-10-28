@@ -46,6 +46,8 @@ window.sendPaste = function sendPaste() {
     const pasteUrl = encryptedText.concat('#', passphrase);
     noteAbovePasteBox.innerText = "Your paste is: ";
 
+    window.location.hash = pasteUrl;
+
     let link = document.createElement('a');
     link.setAttribute('href', './#' + pasteUrl);
     link.innerText = '#' + pasteUrl;
