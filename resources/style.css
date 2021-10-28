@@ -7,6 +7,8 @@
 
     --blue-subtle-bg: #b5d0ff;
     --cyan-subtle-bg: #c0efff;
+    --green-subtle-bg: #aecf90;
+    --red-subtle-bg: #f2b0a2;
     --bg-hl-alt-intense: #e8dfd1;
 
     --fg-main: #000000;
@@ -36,6 +38,8 @@
 
         --blue-subtle-bg: #10387c;
         --cyan-subtle-bg: #00415e;
+        --green-subtle-bg: #2f4a00;
+        --red-subtle-bg: #762422;
         --bg-hl-alt-intense: #282e46;
 
         --fg-main: #ffffff;
@@ -165,7 +169,7 @@ a:visited:hover, a:visited:focus {
 
 .paste-box-wrapper .paste-box {
     padding: 1ch;
-    min-height: 50vh;
+    min-height: 72vh;
     background-color: var(--bg-alt);
     border: 1px solid var(--bg-hl-alt-intense);
     overflow-wrap: anywhere;
@@ -179,3 +183,17 @@ a:visited:hover, a:visited:focus {
     margin-top: 20px;
     float: right;
 }
+
+.success {
+    background-color: var(--green-subtle-bg);
+    padding: 1ch;
+    overflow-wrap: break-word;
+}
+
+.failure {
+    background-color: var(--red-subtle-bg);
+    padding: 1ch;
+    overflow-wrap: break-word;
+}
+
+.hidden { display:none; }
