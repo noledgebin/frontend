@@ -33,7 +33,7 @@ window.sendPaste = function sendPaste() {
     if (paste.compressed) {
         // Increasing mem may increase performance at the cost of memory.
         // The mem ranges from 0 to 12, where 4 is the default.
-        const buf = fflate.strToU8(paste);
+        const buf = fflate.strToU8(paste.text);
 
         // Convert the compressed paste to string before storing it.
         // Later we're stringifying this object, if we don't convert
