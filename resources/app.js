@@ -3,8 +3,13 @@
 import * as fflate from 'fflate';
 import * as CryptoJS from 'crypto-js';
 
+// cryptoRandomString is async.
+import 'regenerator-runtime/runtime';
+import cryptoRandomString from 'crypto-random-string';
+
 window.sendPaste = function sendPaste() {
-    const passphrase = 'secret-key';
+    const passphrase = cryptoRandomString({length: 64, type: 'url-safe'});
+    console.log("passphrase", passphrase);
 
     const paste = document.getElementById("user-paste").innerText;
     console.log("Paste", paste);

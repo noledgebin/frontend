@@ -5,7 +5,9 @@
     "main": "index.html",
     "dependencies": {
         "crypto-js": "^4.1.1",
-        "fflate": "^0.7.1"
+        "crypto-random-string": "^4.0.0",
+        "fflate": "^0.7.1",
+        "regenerator-runtime": "^0.13.9"
     },
     "devDependencies": {
         "parcel-bundler": "^1.12.5"
