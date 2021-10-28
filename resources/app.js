@@ -27,18 +27,22 @@ window.sendPaste = function sendPaste() {
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
     console.log("passphrase", passphrase);
 
-    const paste = pasteBox.innerText;
+    let paste = {
+        "text": pasteBox.innerText,
+        "compressed": pasteBox.innerText.length <= 72 ? false : true
+    };
     console.log("Paste", paste);
 
-    // Increasing mem may increase performance at the cost of memory.
-    // The mem ranges from 0 to 12, where 4 is the default.
-    const buf = fflate.strToU8(paste);
-    const compressedPaste = fflate.compressSync(buf, { level: 6, mem: 8 });
-    console.log("Compressed", compressedPaste);
+    if (paste.compressed) {
+        // Increasing mem may increase performance at the cost of memory.
+        // The mem ranges from 0 to 12, where 4 is the default.
+        const buf = fflate.strToU8(paste);
+        paste.text = fflate.compressSync(buf, { level: 6, mem: 8 });
+    }
 
     // Convert compressedPaste to string before encrypting it.
     const encryptedText = CryptoJS.AES.encrypt(
-        compressedPaste.toString(), passphrase
+        JSON.stringify(paste), passphrase
     ).toString();
     console.log("Encrypted", encryptedText);
 
@@ -69,20 +73,21 @@ function initialize() {
         const encryptedText = fragment[0];
         const passphrase = fragment[1];
 
-        // Get originalText by converting the decrypted string to Array.
-        // Then we convert the strings in Array to Number with map, then
-        // convert it to Uint8Array.
         const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
-        const originalText = Uint8Array.from(
-            bytes.toString(CryptoJS.enc.Utf8).split(',').map(Number)
-        );
-        console.log("Decrypted", originalText);
+        let paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-        const decompressed = fflate.decompressSync(originalText);
-        const outPaste = fflate.strFromU8(decompressed);
-        console.log("Decompressed", outPaste);
+        if (paste.compressed) {
+            // Get originalText by converting the decrypted string to
+            // Array. Then we convert the strings in Array to Number
+            // with map, then convert it to Uint8Array.
+            const originalText = Uint8Array.from(
+                bytes.toString(CryptoJS.enc.Utf8).split(',').map(Number)
+            );
+            const decompressed = fflate.decompressSync(originalText);
+            paste.text = fflate.strFromU8(decompressed);
+        }
 
-        pasteBox.innerText = outPaste;
+        pasteBox.innerText = paste.text;
 
         noteAbovePasteBox.innerText = "Paste successfully decrypted.";
         noteAbovePasteBox.classList.remove("failure", "hidden");
