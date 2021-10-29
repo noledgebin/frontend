@@ -9,10 +9,6 @@ import cryptoRandomString from 'crypto-random-string';
 
 // Paste Elements /////////////////////////////////////////////////////////////
 const pasteBox = document.getElementById('user-paste');
-
-const pasteSendButton = document.getElementById('paste-send-button');
-const pasteNewButton = document.getElementById('paste-new-button');
-
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
 
 window.newPaste = function newPaste() {
@@ -64,9 +60,6 @@ window.sendPaste = function sendPaste() {
     noteAbovePasteBox.classList.add("success");
 
     pasteBox.setAttribute('contenteditable', false);
-
-    pasteSendButton.classList.add("hidden");
-    pasteNewButton.classList.remove("hidden");
 }
 
 function initialize() {
@@ -100,11 +93,7 @@ function initialize() {
         noteAbovePasteBox.innerText = "Paste successfully decrypted.";
         noteAbovePasteBox.classList.remove("failure", "hidden");
         noteAbovePasteBox.classList.add("success");
-
-        pasteNewButton.classList.remove("hidden");
-    } else {
+    } else
         pasteBox.setAttribute('contenteditable', true);
-        pasteSendButton.classList.remove("hidden");
-    }
 }
 initialize();

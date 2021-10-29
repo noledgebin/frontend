@@ -38,11 +38,14 @@
         </div>
 
         <div class="wrapper">
+            <div id="top-nav-bar">
+                <button id="new-button" onclick="newPaste();">New Paste</button>
+                <button id="clone-button" onclick="clonePaste();">Clone</button>
+                <button id="send-button" onclick="sendPaste();">Send</button>
+            </div>
             <div class="paste-box-wrapper">
                 <p id="note-above-paste-box" class="hidden"></p>
                 <div id="user-paste" class="paste-box" contenteditable="false"></div>
-                <button id="paste-send-button" class="hidden" onclick="sendPaste();">Send</button>
-                <button id="paste-new-button" class="hidden" onclick="newPaste();">New Paste</button>
             </div>
         </div>
 

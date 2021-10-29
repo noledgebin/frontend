@@ -175,25 +175,32 @@ a:visited:hover, a:visited:focus {
     overflow-wrap: anywhere;
 }
 
-.paste-box-wrapper button {
+#top-nav-bar {
+    background-color: var(--bg-dim);
+    margin: 1ch 0;
+}
+#top-nav-bar button {
     background-color: var(--blue-subtle-bg);
     color: var(--fg-main);
-    padding: 0.8em 1.6em;
+    padding: 0.64em 1.2em;
+    margin: 1ch 0;
     border: 1px solid var(--fg-alt);
-    margin-top: 20px;
+}
+/* Override send button styles */
+#send-button {
+    background-color: var(--cyan-subtle-bg) !important;
     float: right;
 }
 
-.success {
-    background-color: var(--green-subtle-bg);
+#note-above-paste-box {
     padding: 1ch;
     overflow-wrap: break-word;
+}
+.success {
+    background-color: var(--green-subtle-bg);
 }
 
 .failure {
     background-color: var(--red-subtle-bg);
-    padding: 1ch;
-    overflow-wrap: break-word;
 }
-
 .hidden { display:none; }
