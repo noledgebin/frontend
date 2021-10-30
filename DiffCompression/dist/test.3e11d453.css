@@ -1,0 +1,43 @@
+:root
+{
+    --color-one : #deb986;
+    --color-two : #db6c79;
+}
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Verdana, Geneva, Tahoma, sans-serif
+}
+body{
+    background-color:var(--color-one);
+    height:100vh
+}
+.container
+{
+    background-color:var(--color-two);
+    position: relative;
+    /* transform:translate(39%,30%); */
+    top:20%;
+    left:30%;
+    width:400px;
+    height:400px;
+    border-radius: 20px;
+    visibility: visible;
+}
+
+form *{
+    
+    margin-top: 10px;
+    margin-left:30px
+}
+#length
+{
+    margin-top:10px
+}
+input{
+    padding: 9px 7px;
+}
+
+/*# sourceMappingURL=/test.3e11d453.css.map */
