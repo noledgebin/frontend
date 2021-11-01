@@ -21,6 +21,8 @@ window.newPaste = function newPaste() {
 
 window.sendPaste = function sendPaste() {
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
+    console.log("passphrase", passphrase);
+    // Paste
     let paste = {
         "text": pasteBox.innerText,
         "compressed": pasteBox.innerText.length <= 72 ? false : true
@@ -72,7 +74,6 @@ window.sendPaste = function sendPaste() {
     noteAbovePasteBox.classList.add("success");
     pasteBox.setAttribute('contenteditable', false);
 
-    pasteBox.setAttribute('contenteditable', false);
 }
 
 function initialize() {
@@ -82,11 +83,12 @@ function initialize() {
     if (fragment.length === 2) {
         const encryptedText = fragment[0];
         const passphrase = fragment[1];
+        let paste;
         
         try{
             // Decrypt the text and parse it to get the paste structure.
             const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
-            let paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
         } catch(err){
             console.log("error: "+ err);
@@ -127,3 +129,10 @@ function initialize() {
         pasteBox.setAttribute('contenteditable', true);
 }
 initialize();
+window.clonePaste = function clonePaste(){
+    // Remove fragment url.
+    window.location.hash = "";
+
+    //make the div editable.
+    pasteBox.setAttribute('contenteditable', true);
+}
