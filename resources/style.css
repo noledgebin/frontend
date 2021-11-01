@@ -167,12 +167,30 @@ a:visited:hover, a:visited:focus {
 
 /* Paste box *****************************************************************/
 
-.paste-box-wrapper .paste-box {
+.paste-box-wrapper textarea {
     padding: 1ch;
-    min-height: 72vh;
+    height: 64vh;
+    width: 100%;
+    resize: vertical;
+    vertical-align:top;
+    font-size: 0.96rem;
+
+    color: var(--fg-main);
     background-color: var(--bg-alt);
     border: 1px solid var(--bg-hl-alt-intense);
-    overflow-wrap: anywhere;
+
+}
+pre {
+    padding: 0.6em;
+    display: block;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.96rem;
+
+    color: var(--fg-main);
+    background-color: var(--bg-alt);
+    border: 1px solid var(--bg-hl-alt-intense);
 }
 
 #top-nav-bar {
@@ -203,4 +221,3 @@ a:visited:hover, a:visited:focus {
 .failure {
     background-color: var(--red-subtle-bg);
 }
-.hidden { display:none; }

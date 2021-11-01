@@ -8,9 +8,16 @@ import { base64ToUint8Array, uint8ArrayToBase64 } from 'base64-u8array-arraybuff
 import 'regenerator-runtime/runtime';
 import cryptoRandomString from 'crypto-random-string';
 
-// Paste Elements /////////////////////////////////////////////////////////////
+// Paste Elements.
 const pasteBox = document.getElementById('user-paste');
+const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
+
+function displaySuccessNote() {
+    noteAbovePasteBox.classList.add("success");
+    noteAbovePasteBox.classList.remove("failure");
+    noteAbovePasteBox.style.display = '';
+}
 
 window.newPaste = function newPaste() {
     // Remove fragment url.
@@ -20,11 +27,12 @@ window.newPaste = function newPaste() {
     window.location.reload();
 }
 
+// sendPaste reads data from pasteBox and acts on it.
 window.sendPaste = function sendPaste() {
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
     let paste = {
-        "text": pasteBox.innerText,
-        "compressed": pasteBox.innerText.length <= 72 ? false : true
+        "text": pasteBox.value,
+        "compressed": pasteBox.value.length <= 72 ? false : true
     };
 
     if (paste.compressed) {
@@ -74,15 +82,20 @@ window.sendPaste = function sendPaste() {
     let link = document.createElement('a');
     link.setAttribute('href', './#' + pasteUrl);
     link.innerText = '#' + pasteUrl;
+
     noteAbovePasteBox.appendChild(link);
+    displaySuccessNote();
 
-    noteAbovePasteBox.classList.remove("failure", "hidden");
-    noteAbovePasteBox.classList.add("success");
-
-    pasteBox.setAttribute('contenteditable', false);
+    // Show rendered text.
+    pasteBox.style.display = 'none';
+    pasteBoxRendered.style.display = '';
+    pasteBoxRendered.innerHTML = pasteBox.value;
 }
 
 function initialize() {
+    // Clean the pasteBox.
+    pasteBox.value = '';
+
     const fragment = window.location.hash.substr(1).split('#');
 
     // Paste & Encryption key in fragment URL.
@@ -127,13 +140,13 @@ function initialize() {
         }
 
         // Update the text.
-        pasteBox.innerText = paste.text;
+        pasteBox.style.display = 'none';
+        pasteBoxRendered.style.display = '';
+        pasteBoxRendered.innerHTML = paste.text;
 
         // Inform user about the paste.
         noteAbovePasteBox.innerText = "Paste successfully decrypted.";
-        noteAbovePasteBox.classList.remove("failure", "hidden");
-        noteAbovePasteBox.classList.add("success");
-    } else
-        pasteBox.setAttribute('contenteditable', true);
+        displaySuccessNote();
+    }
 }
 initialize();
