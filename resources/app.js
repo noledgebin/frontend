@@ -19,6 +19,12 @@ function displaySuccessNote() {
     noteAbovePasteBox.style.display = '';
 }
 
+function displayFailureNote() {
+    noteAbovePasteBox.classList.add("failure");
+    noteAbovePasteBox.classList.remove("success");
+    noteAbovePasteBox.style.display = '';
+}
+
 window.newPaste = function newPaste() {
     // Remove fragment url.
     window.location.hash = '';
@@ -66,8 +72,7 @@ window.sendPaste = function sendPaste() {
     } catch(err) {
         console.log("Cannot recover from Encryption failure.", err);
         noteAbovePasteBox.innerText = "Encryption failed.";
-        noteAbovePasteBox.classList.remove("hidden", "success");
-        noteAbovePasteBox.classList.add("failure");
+        displayFailureNote();
         return;
     }
 
@@ -110,10 +115,8 @@ function initialize() {
             paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         } catch(err) {
             console.log("Decryption failure.", err);
-
             noteAbovePasteBox.innerText = "Decryption failure.";
-            noteAbovePasteBox.classList.remove("hidden", "success");
-            noteAbovePasteBox.classList.add("failure");
+            displayFailureNote();
             return;
         }
 
@@ -131,10 +134,8 @@ function initialize() {
                 paste.text = fflate.strFromU8(decompressed);
             } catch(err) {
                 console.log("Decompression failure.", err);
-
                 noteAbovePasteBox.innerText = "Decompression failure.";
-                noteAbovePasteBox.classList.remove("hidden", "success");
-                noteAbovePasteBox.classList.add("failure");
+                displayFailureNote();
                 return;
             }
         }
