@@ -169,7 +169,7 @@ a:visited:hover, a:visited:focus {
 
 .paste-box-wrapper textarea {
     padding: 1ch;
-    min-height: 32vh;
+    height: 64vh;
     width: 100%;
     resize: vertical;
     vertical-align:top;
@@ -180,12 +180,12 @@ a:visited:hover, a:visited:focus {
     border: 1px solid var(--bg-hl-alt-intense);
 
 }
-.paste-box-wrapper pre {
+pre {
     padding: 0.6em;
     display: block;
     overflow-x: auto;
-    white-space: pre;
-    word-break: break-all;
+    white-space: pre-wrap;
+    word-wrap: break-word;
     font-size: 0.96rem;
 
     color: var(--fg-main);

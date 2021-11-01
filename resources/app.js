@@ -69,10 +69,13 @@ window.sendPaste = function sendPaste() {
     // Show rendered text.
     pasteBox.style.display = 'none';
     pasteBoxRendered.style.display = '';
-    pasteBoxRendered.innerHTML = paste.text;
+    pasteBoxRendered.innerHTML = pasteBox.value;
 }
 
 function initialize() {
+    // Clean the pasteBox.
+    pasteBox.value = '';
+
     const fragment = window.location.hash.substr(1).split('#');
 
     // Paste & Encryption key in fragment URL.
