@@ -7,9 +7,21 @@ import * as CryptoJS from 'crypto-js';
 import 'regenerator-runtime/runtime';
 import cryptoRandomString from 'crypto-random-string';
 
-// Paste Elements /////////////////////////////////////////////////////////////
+// Paste Elements.
 const pasteBox = document.getElementById('user-paste');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
+
+// Add event listener to user-paste to strip formatting.
+function handlePasting (e) {
+    // Stop data actually being pasted into div.
+    e.stopPropagation();
+    e.preventDefault();
+
+    // Get pasted data via clipboard API.
+    let clipboardData = e.clipboardData || window.clipboardData;
+    pasteBox.innerText = clipboardData.getData('Text');
+}
+pasteBox.addEventListener('paste', handlePasting);
 
 window.newPaste = function newPaste() {
     // Remove fragment url.
@@ -19,6 +31,7 @@ window.newPaste = function newPaste() {
     window.location.reload();
 }
 
+// sendPaste reads data from pasteBox and acts on it.
 window.sendPaste = function sendPaste() {
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
     let paste = {
