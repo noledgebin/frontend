@@ -2,6 +2,7 @@
 
 import * as fflate from 'fflate';
 import * as CryptoJS from 'crypto-js';
+import { base64ToUint8Array, uint8ArrayToBase64 } from 'base64-u8array-arraybuffer';
 
 // cryptoRandomString is async.
 import 'regenerator-runtime/runtime';
@@ -28,16 +29,19 @@ window.sendPaste = function sendPaste() {
 
     if (paste.compressed) {
         try {
+            const buf = fflate.strToU8(paste.text);
+
             // Increasing mem may increase performance at the cost of
             // memory. The mem ranges from 0 to 12, where 4 is the
             // default.
-            const buf = fflate.strToU8(paste.text);
-
+            //
             // Convert the compressed paste to string before storing
             // it. Later we're stringifying this object, if we don't
             // convert it to string here then JSON.stringify will
             // preserve the Array structure, using much more space.
-            paste.text = fflate.compressSync(buf, { level: 6, mem: 8 }).toString();
+            paste.text = uint8ArrayToBase64(
+                fflate.compressSync(buf, { level: 6, mem: 8 })
+            );
         } catch(err) {
             console.log("Decompression failed, turning off.", err);
             paste.text = pasteBox.innerText;
@@ -107,7 +111,7 @@ function initialize() {
                 // converting paste.text to Array. It was converted to
                 // string so the Array structure was not preserved.
                 decompressed = fflate.decompressSync(
-                    Uint8Array.from(paste.text.split(',').map(Number))
+                    base64ToUint8Array(paste.text)
                 );
 
                 // Store decompressed text.
