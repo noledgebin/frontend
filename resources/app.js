@@ -9,19 +9,14 @@ import cryptoRandomString from 'crypto-random-string';
 
 // Paste Elements.
 const pasteBox = document.getElementById('user-paste');
+const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
 
-// Add event listener to user-paste to strip formatting.
-function handlePasting (e) {
-    // Stop data actually being pasted into div.
-    e.stopPropagation();
-    e.preventDefault();
-
-    // Get pasted data via clipboard API.
-    let clipboardData = e.clipboardData || window.clipboardData;
-    pasteBox.innerText = clipboardData.getData('Text');
+function displaySuccessNote() {
+    noteAbovePasteBox.classList.add("success");
+    noteAbovePasteBox.classList.remove("failure");
+    noteAbovePasteBox.style.display = '';
 }
-pasteBox.addEventListener('paste', handlePasting);
 
 window.newPaste = function newPaste() {
     // Remove fragment url.
@@ -35,8 +30,8 @@ window.newPaste = function newPaste() {
 window.sendPaste = function sendPaste() {
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
     let paste = {
-        "text": pasteBox.innerText,
-        "compressed": pasteBox.innerText.length <= 72 ? false : true
+        "text": pasteBox.value,
+        "compressed": pasteBox.value.length <= 72 ? false : true
     };
 
     if (paste.compressed) {
@@ -67,12 +62,14 @@ window.sendPaste = function sendPaste() {
     let link = document.createElement('a');
     link.setAttribute('href', './#' + pasteUrl);
     link.innerText = '#' + pasteUrl;
+
     noteAbovePasteBox.appendChild(link);
+    displaySuccessNote();
 
-    noteAbovePasteBox.classList.remove("failure", "hidden");
-    noteAbovePasteBox.classList.add("success");
-
-    pasteBox.setAttribute('contenteditable', false);
+    // Show rendered text.
+    pasteBox.style.display = 'none';
+    pasteBoxRendered.style.display = '';
+    pasteBoxRendered.innerHTML = paste.text;
 }
 
 function initialize() {
@@ -100,13 +97,13 @@ function initialize() {
         }
 
         // Update the text.
-        pasteBox.innerText = paste.text;
+        pasteBox.style.display = 'none';
+        pasteBoxRendered.style.display = '';
+        pasteBoxRendered.innerHTML = paste.text;
 
         // Inform user about the paste.
         noteAbovePasteBox.innerText = "Paste successfully decrypted.";
-        noteAbovePasteBox.classList.remove("failure", "hidden");
-        noteAbovePasteBox.classList.add("success");
-    } else
-        pasteBox.setAttribute('contenteditable', true);
+        displaySuccessNote();
+    }
 }
 initialize();
