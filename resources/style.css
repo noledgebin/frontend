@@ -169,10 +169,17 @@ a:visited:hover, a:visited:focus {
 
 .paste-box-wrapper .paste-box {
     padding: 1ch;
-    min-height: 72vh;
+    min-height: 32vh;
     background-color: var(--bg-alt);
     border: 1px solid var(--bg-hl-alt-intense);
     overflow-wrap: anywhere;
+}
+.paste-box-wrapper textarea {
+    width: 100%;
+    resize: vertical;
+    vertical-align:top;
+    color: var(--fg-main);
+    font-size: 0.96rem;
 }
 
 #top-nav-bar {
