@@ -25,15 +25,27 @@ function displayFailureNote() {
     noteAbovePasteBox.style.display = '';
 }
 
-function hideAboveNote(){
-    noteAbovePasteBox.style.display = 'none';
-}
 window.newPaste = function newPaste() {
     // Remove fragment url.
     window.location.hash = '';
 
     // Reload.
     window.location.reload();
+}
+
+window.clonePaste = function clonePaste() {
+    // Remove fragment url.
+    window.location.hash = '';
+
+    // Clone the paste in pasteBox.
+    pasteBox.value = pasteBoxRendered.innerHTML;
+
+    // Show textarea.
+    pasteBoxRendered.style.display = 'none';
+    pasteBox.style.display = '';
+
+    // Hide note.
+    noteAbovePasteBox.style.display = 'none';
 }
 
 // sendPaste reads data from pasteBox and acts on it.
@@ -147,24 +159,9 @@ function initialize() {
         pasteBoxRendered.style.display = '';
         pasteBoxRendered.innerHTML = paste.text;
 
-        //Clone the paste in pasteBox
-        pasteBox.value = paste.text;
-
         // Inform user about the paste.
         noteAbovePasteBox.innerText = "Paste successfully decrypted.";
-
         displaySuccessNote();
     }
 }
 initialize();
-window.clonePaste = function clonePaste(){
-    // Remove fragment url.
-    window.location.hash = '';
-
-    //make paste editable
-    pasteBoxRendered.style.display = 'none';
-    pasteBox.style.display = '';
-
-    //make noteAbovePasteBox display none
-    hideAboveNote();
-}
