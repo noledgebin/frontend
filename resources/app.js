@@ -33,6 +33,21 @@ window.newPaste = function newPaste() {
     window.location.reload();
 }
 
+window.clonePaste = function clonePaste() {
+    // Remove fragment url.
+    window.location.hash = '';
+
+    // Clone the paste in pasteBox.
+    pasteBox.value = pasteBoxRendered.innerHTML;
+
+    // Show textarea.
+    pasteBoxRendered.style.display = 'none';
+    pasteBox.style.display = '';
+
+    // Hide note.
+    noteAbovePasteBox.style.display = 'none';
+}
+
 // sendPaste reads data from pasteBox and acts on it.
 window.sendPaste = function sendPaste() {
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
