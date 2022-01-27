@@ -9,7 +9,20 @@
 # Clone the project.
 git clone https://github.com/noledgebin/frontend
 cd frontend
+#+end_src
 
+Create =env.js= in =./resources= with the following contents
+
+#+begin_src js
+// Server URL for requests. Used in app.js to send requests
+export const env = {
+    serverUrl: 'http://www.domainforserver.com/api/v1/'
+}
+#+end_src
+
+Run project
+
+#+begin_src sh
 npm install # Get dependencies.
 npm run dev # Build for development.
 npm run build # Build for deployment.
