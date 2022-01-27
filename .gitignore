@@ -120,3 +120,6 @@ dist
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+# Server.js
+resources/env.js
