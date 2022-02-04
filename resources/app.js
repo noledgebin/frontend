@@ -13,6 +13,65 @@ const pasteBox = document.getElementById('user-paste');
 const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
 
+//hamitems
+const serverlessCheck = document.getElementById('serverless')
+const expireTime = document.getElementById("expires-time");
+const BurnAfterRead = document.getElementById("burnAfterRead");
+const Passwd = document.getElementById("Passwd");
+
+serverlessCheck.addEventListener('click',()=>{
+
+    if(serverlessCheck.checked)
+    {
+        console.log(serverlessCheck.checked)
+        expireTime.value = 'never';
+        BurnAfterRead.checked = false;
+        Passwd.checked = false;
+        expireTime.disabled = true;
+        BurnAfterRead.disabled = true;
+        Passwd.disabled = true
+    }
+    else{
+        expireTime.disabled = false;
+        BurnAfterRead.disabled = false;
+        Passwd.disabled = false
+        
+    }
+    console.log(expireTime.value)
+})
+
+BurnAfterRead.addEventListener('click',()=>{
+    if(BurnAfterRead.checked)
+    {
+        expireTime.value = 'never';
+        expireTime.disabled = true;
+    }
+    else{
+        expireTime.disabled = false;
+    }
+})
+
+function expireVal(){
+    switch(expireTime.value){
+        case "never":
+            return false;
+        case "5min":
+            return (5*60)
+        case "10min":
+            return (10*60)
+        case "1hr":
+            return (60*60)
+        case "1day":
+            return (24*60*60)
+        case "1week":
+            return (7*24*60*60)
+        case "1mon":
+            return (30*24*60*60)
+        case "1yr":
+            return (365*24*60*60)
+    }
+}
+//--------
 function displaySuccessNote() {
     noteAbovePasteBox.classList.add("success");
     noteAbovePasteBox.classList.remove("failure");
@@ -53,9 +112,11 @@ window.sendPaste = function sendPaste() {
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
     let paste = {
         "text": pasteBox.value,
-        "compressed": pasteBox.value.length <= 72 ? false : true
+        "compressed": pasteBox.value.length <= 72 ? false : true,
+        "BurnAfterRead": BurnAfterRead.checked,
+        "ExpireTime":expireVal()
     };
-
+    console.log(paste)
     if (paste.compressed) {
         try {
             const buf = fflate.strToU8(paste.text);
@@ -78,38 +139,92 @@ window.sendPaste = function sendPaste() {
         }
     }
 
-    let encryptedText;
-    try {
-        // Convert paste to string before encrypting it.
-        encryptedText = CryptoJS.AES.encrypt(
-            JSON.stringify(paste), passphrase
-        ).toString();
-    } catch(err) {
-        console.log("Cannot recover from Encryption failure.", err);
-        noteAbovePasteBox.innerText = "Encryption failed.";
-        displayFailureNote();
-        return;
+    let Pasteid = ""
+    let link = document.createElement("a");
+    console.log(paste)
+    
+    console.log(paste)
+    if(serverlessCheck.checked)
+    {
+        let encryptedText;
+        try {
+            // Convert paste to string before encrypting it.
+            encryptedText = CryptoJS.AES.encrypt(
+                JSON.stringify(paste), passphrase
+            ).toString();
+        } catch(err) {
+            console.log("Cannot recover from Encryption failure.", err);
+            noteAbovePasteBox.innerText = "Encryption failed.";
+            displayFailureNote();
+            return;
+        }
+        const pasteUrl = encryptedText.concat('#', passphrase);
+        console.log(pasteUrl)
+        console.log((encryptedText))
+        noteAbovePasteBox.innerText = "Your paste is: ";
+        window.location.hash = pasteUrl;
+        
+        // Inform user about the Paste.
+        link.setAttribute("href", "./#" + pasteUrl);
+        link.innerText = "#" + pasteUrl;
+
+        noteAbovePasteBox.appendChild(link);
+        console.log(link);
+        displaySuccessNote();
+
+        // Show rendered text.
+        pasteBox.style.display = "none";
+        pasteBoxRendered.style.display = "";
+        pasteBoxRendered.innerHTML = pasteBox.value;
+        
     }
+    else {
+        try {
+            // Convert paste to string before encrypting it.
+            paste.text = CryptoJS.AES.encrypt(
+                JSON.stringify(paste.text), passphrase
+            ).toString();
+        } catch(err) {
+            console.log("Cannot recover from Encryption failure.", err);
+            noteAbovePasteBox.innerText = "Encryption failed.";
+            displayFailureNote();
+            return;
+        }
+        //Sending Paste to the server
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://18.116.44.211:3000/api/store");
+        xhr.setRequestHeader('Content-Type','application/json')
+        xhr.send(JSON.stringify(paste))
+        xhr.onload = ()=>{
+            Pasteid = xhr.response;
+            Pasteid = Pasteid.slice(1,Pasteid.length-1)
+            console.log("PasteID",Pasteid)
 
-    // Add encryptedText and passphrase to fragment url.
-    const pasteUrl = encryptedText.concat('#', passphrase);
-    noteAbovePasteBox.innerText = "Your paste is: ";
+            // Add ObjectID and passphrase to fragment url.
+            const pasteUrl = Pasteid+'#'+passphrase+'#server';
+            console.log("PasteUrl",pasteUrl)
+            noteAbovePasteBox.innerText = "Your paste is: ";
+        
+            // Update the URL.
+            window.location.hash = pasteUrl;
+            
+            // Inform user about the Paste.
+            link.setAttribute("href", "./#" + pasteUrl);
+            link.innerText = "#" + pasteUrl;
 
-    // Update the URL.
-    window.location.hash = pasteUrl;
+            noteAbovePasteBox.appendChild(link);
+            console.log(link);
+            displaySuccessNote();
 
-    // Inform user about the Paste.
-    let link = document.createElement('a');
-    link.setAttribute('href', './#' + pasteUrl);
-    link.innerText = '#' + pasteUrl;
-
-    noteAbovePasteBox.appendChild(link);
-    displaySuccessNote();
-
-    // Show rendered text.
-    pasteBox.style.display = 'none';
-    pasteBoxRendered.style.display = '';
-    pasteBoxRendered.innerHTML = pasteBox.value;
+            // Show rendered text.
+            pasteBox.style.display = "none";
+            pasteBoxRendered.style.display = "";
+            pasteBoxRendered.innerHTML = pasteBox.value;
+        }
+        
+    }
+    
+    
 }
 
 function initialize() {
@@ -117,7 +232,8 @@ function initialize() {
     pasteBox.value = '';
 
     const fragment = window.location.hash.substr(1).split('#');
-
+    console.log(typeof(fragment))//T
+    console.log((fragment))//T
     // Paste & Encryption key in fragment URL.
     if (fragment.length === 2) {
         const encryptedText = fragment[0];
@@ -128,6 +244,8 @@ function initialize() {
             // Decrypt the text and parse it to get the paste structure.
             const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
             paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            console.log('Paste : ',paste)
+            console.log('Bytes : ',bytes)
         } catch(err) {
             console.log("Decryption failure.", err);
             noteAbovePasteBox.innerText = "Decryption failure.";
@@ -162,6 +280,70 @@ function initialize() {
         // Inform user about the paste.
         noteAbovePasteBox.innerText = "Paste successfully decrypted.";
         displaySuccessNote();
+    }
+    else if (fragment.length === 3){
+        if (fragment[2] == "server")
+        {
+            const passphrase = fragment[1];
+            const PasteID = fragment[0];
+            console.log(PasteID)
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", `http://18.116.44.211:3000/api/GetPaste/${PasteID}`);
+            xhr.send();
+            xhr.onload = ()=>{
+                const Paste = JSON.parse(xhr.response)
+                console.log(Paste)
+                if(Paste.message)
+                {
+                    // Update the text.
+                        pasteBox.style.display = 'none';
+                        pasteBoxRendered.style.display = '';
+                        pasteBoxRendered.innerHTML = "😅";
+                        noteAbovePasteBox.innerText = "Paste not found!"
+                        displaySuccessNote();
+                }
+                else{
+
+                    try {
+                        // Decrypt the text and parse it to get the paste structure.
+                        const bytes = CryptoJS.AES.decrypt(Paste.PasteMsg, passphrase);
+                        Paste.PasteMsg = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+                    } catch(err) {
+                        console.log("Decryption failure.", err);
+                        noteAbovePasteBox.innerText = "Decryption failure.";
+                        displayFailureNote();
+                        return;
+                    }
+                    //Have to create pasteCompressedFunction 
+                    if (Paste.compressed) {
+                        try {
+                            // Get the original Uint8Array generated by fflate by
+                            // converting paste.text to Array. It was converted to
+                            // string so the Array structure was not preserved.
+                            const decompressed = fflate.decompressSync(
+                                base64ToUint8Array(Paste.PasteMsg)
+                                );
+                                
+                                // Store decompressed text.
+                                Paste.PasteMsg = fflate.strFromU8(decompressed);
+                            } catch(err) {
+                                console.log("Decompression failure.", err);
+                                noteAbovePasteBox.innerText = "Decompression failure.";
+                                displayFailureNote();
+                                return;
+                            }
+                        }
+                        // Update the text.
+                        pasteBox.style.display = 'none';
+                        pasteBoxRendered.style.display = '';
+                        pasteBoxRendered.innerHTML = Paste.PasteMsg;
+                    
+                        // Inform user about the paste.
+                        noteAbovePasteBox.innerText = "Paste successfully decrypted.";
+                        displaySuccessNote();
+                }
+                }
+        }
     }
 }
 initialize();
