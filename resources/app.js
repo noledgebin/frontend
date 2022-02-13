@@ -7,11 +7,18 @@ import { base64ToUint8Array, uint8ArrayToBase64 } from 'base64-u8array-arraybuff
 // cryptoRandomString is async.
 import 'regenerator-runtime/runtime';
 import cryptoRandomString from 'crypto-random-string';
+import hljs from 'highlight.js';
+
+//text highlighter 
+// hljs = require("highlight.js");
+// hljs.highlightAuto("<h1>Hello World!</h1>").value;
 
 // Paste Elements.
 const pasteBox = document.getElementById('user-paste');
 const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
+const syntaxHl = document.getElementById("syntax-hl");
+
 
 //hamitems
 const serverlessCheck = document.getElementById('serverless')
@@ -19,8 +26,32 @@ const expireTime = document.getElementById("expires-time");
 const BurnAfterRead = document.getElementById("burnAfterRead");
 const Passwd = document.getElementById("Passwd");
 
-serverlessCheck.addEventListener('click',()=>{
+let URL = "localhost" //Temp
 
+//If the backend isn't responding then automatically switch to serverless mode.
+function goingServerless(){
+    alert("Backend is down, switching to server-less mode");
+    window.location.hash = "";
+    serverlessCheck.click();
+    serverlessCheck.disabled = true;
+}
+
+const xhr = new XMLHttpRequest();
+xhr.open("GET", `http://${URL}:3000/api/`);
+xhr.send()
+xhr.onerror = (e)=>{
+    goingServerless()
+}
+xhr.onload = ()=>{
+    let res = xhr.response
+    console.log(res)
+    if(res != 'OK')
+        goingServerless()
+}
+//---
+
+//Disabling other features when serverless mode is checked
+serverlessCheck.addEventListener('click',()=>{
     if(serverlessCheck.checked)
     {
         console.log(serverlessCheck.checked)
@@ -40,6 +71,7 @@ serverlessCheck.addEventListener('click',()=>{
     console.log(expireTime.value)
 })
 
+//Disabling Expiry Time when BurnAfterRead is checked.
 BurnAfterRead.addEventListener('click',()=>{
     if(BurnAfterRead.checked)
     {
@@ -50,7 +82,7 @@ BurnAfterRead.addEventListener('click',()=>{
         expireTime.disabled = false;
     }
 })
-
+// Calculating the expiry time.
 function expireVal(){
     switch(expireTime.value){
         case "never":
@@ -71,7 +103,7 @@ function expireVal(){
             return (365*24*60*60)
     }
 }
-//--------
+
 function displaySuccessNote() {
     noteAbovePasteBox.classList.add("success");
     noteAbovePasteBox.classList.remove("failure");
@@ -83,6 +115,130 @@ function displayFailureNote() {
     noteAbovePasteBox.classList.remove("success");
     noteAbovePasteBox.style.display = '';
 }
+
+function compressor(Content){
+    try {
+            const buf = fflate.strToU8(Content);
+
+            // Increasing mem may increase performance at the cost of
+            // memory. The mem ranges from 0 to 12, where 4 is the
+            // default.
+            //
+            // Convert the compressed paste to string before storing
+            // it. Later we're stringifying this object, if we don't
+            // convert it to string here then JSON.stringify will
+            // preserve the Array structure, using much more space.
+            Content = uint8ArrayToBase64(
+                fflate.compressSync(buf, { level: 6, mem: 8 })
+            );
+        } catch(err) {
+            console.log("Decompression failed, turning off.", err);
+            Content.text = pasteBox.innerText;
+            Content.compressed = false;
+        }
+    console.log("Compressed Paste : ", Content)
+    return Content
+}
+
+function encryptor(Content,passphrase){
+    let encryptedText;
+        try {
+            // Convert paste to string before encrypting it.
+            encryptedText = CryptoJS.AES.encrypt(
+                JSON.stringify(Content), passphrase
+            ).toString();
+        } catch(err) {
+            console.log("Cannot recover from Encryption failure.", err);
+            noteAbovePasteBox.innerText = "Encryption failed.";
+            displayFailureNote();
+            return;
+        }
+        return encryptedText
+    }
+    
+    function linkDisplay(encryptedText,passphrase,server){
+    console.log(server)
+    let pasteUrl
+    if(server)
+    {
+        pasteUrl = encryptedText+"#"+passphrase+"#server";
+    }
+    else{
+        pasteUrl = encryptedText.concat("#", passphrase);
+    }
+    console.log(pasteUrl); //T
+    console.log(encryptedText); //T
+    noteAbovePasteBox.innerText = "Your paste is: ";
+    window.location.hash = pasteUrl;
+    
+    // Inform user about the Paste.
+    let link = document.createElement("a");
+    link.setAttribute("href", "./#" + pasteUrl);
+    link.innerText = "#" + pasteUrl;
+    
+    noteAbovePasteBox.appendChild(link);
+    console.log(link);
+    displaySuccessNote();
+    
+    // Show rendered text.
+    if(syntaxHl)
+    {
+        pasteBox.value = hljs.highlightAuto(pasteBox.value).value;
+    }
+    pasteBox.style.display = "none";
+    pasteBoxRendered.style.display = "";
+    pasteBoxRendered.innerHTML = pasteBox.value;
+}
+function decompressor(paste){
+    try {
+            // Get the original Uint8Array generated by fflate by
+            // converting paste.text to Array. It was converted to
+            // string so the Array structure was not preserved.
+            const decompressed = fflate.decompressSync(
+                base64ToUint8Array(paste.text)
+            );
+
+            // Store decompressed text.
+            paste.text = fflate.strFromU8(decompressed);
+            } catch(err) {
+            console.log("Decompression failure.", err);
+            noteAbovePasteBox.innerText = "Decompression failure.";
+            displayFailureNote();
+            return;
+            }
+    return paste
+}
+
+function decryptor(encryptedText,passphrase){
+    let DencryptedText;
+        try {
+            // Decrypt the text and parse it to get the paste structure.
+            const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
+            DencryptedText = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            console.log("Paste : ", DencryptedText);
+            console.log('Bytes : ',bytes)
+        } catch(err) {
+            console.log("Decryption failure.", err);
+            noteAbovePasteBox.innerText = "Decryption failure.";
+            displayFailureNote();
+            return;
+        }
+    return DencryptedText;
+}
+function displayUpdate(paste){
+    // Update the text.
+    if(paste.syntaxHl)
+    {
+        paste.text = hljs.highlightAuto(paste.text).value;
+    }
+    pasteBox.style.display = 'none';
+    pasteBoxRendered.style.display = '';
+    pasteBoxRendered.innerHTML = paste.text;
+    // Inform user about the paste.
+    noteAbovePasteBox.innerText = "Paste successfully decrypted.";
+    displaySuccessNote();
+}
+
 
 window.newPaste = function newPaste() {
     // Remove fragment url.
@@ -114,116 +270,37 @@ window.sendPaste = function sendPaste() {
         "text": pasteBox.value,
         "compressed": pasteBox.value.length <= 72 ? false : true,
         "BurnAfterRead": BurnAfterRead.checked,
-        "ExpireTime":expireVal()
+        "ExpireTime":expireVal(),
+        "syntaxHl":syntaxHl.checked
     };
     console.log(paste)
     if (paste.compressed) {
-        try {
-            const buf = fflate.strToU8(paste.text);
-
-            // Increasing mem may increase performance at the cost of
-            // memory. The mem ranges from 0 to 12, where 4 is the
-            // default.
-            //
-            // Convert the compressed paste to string before storing
-            // it. Later we're stringifying this object, if we don't
-            // convert it to string here then JSON.stringify will
-            // preserve the Array structure, using much more space.
-            paste.text = uint8ArrayToBase64(
-                fflate.compressSync(buf, { level: 6, mem: 8 })
-            );
-        } catch(err) {
-            console.log("Decompression failed, turning off.", err);
-            paste.text = pasteBox.innerText;
-            paste.compressed = false;
-        }
+        paste.text = compressor(paste.text)
+        // console.log("Compressed Paste :",paste.text)
     }
 
-    let Pasteid = ""
-    let link = document.createElement("a");
-    console.log(paste)
-    
-    console.log(paste)
     if(serverlessCheck.checked)
     {
-        let encryptedText;
-        try {
-            // Convert paste to string before encrypting it.
-            encryptedText = CryptoJS.AES.encrypt(
-                JSON.stringify(paste), passphrase
-            ).toString();
-        } catch(err) {
-            console.log("Cannot recover from Encryption failure.", err);
-            noteAbovePasteBox.innerText = "Encryption failed.";
-            displayFailureNote();
-            return;
-        }
-        const pasteUrl = encryptedText.concat('#', passphrase);
-        console.log(pasteUrl)
-        console.log((encryptedText))
-        noteAbovePasteBox.innerText = "Your paste is: ";
-        window.location.hash = pasteUrl;
-        
-        // Inform user about the Paste.
-        link.setAttribute("href", "./#" + pasteUrl);
-        link.innerText = "#" + pasteUrl;
-
-        noteAbovePasteBox.appendChild(link);
-        console.log(link);
-        displaySuccessNote();
-
-        // Show rendered text.
-        pasteBox.style.display = "none";
-        pasteBoxRendered.style.display = "";
-        pasteBoxRendered.innerHTML = pasteBox.value;
-        
+        let encryptedText = encryptor(paste,passphrase)
+        linkDisplay(encryptedText,passphrase)
     }
     else {
-        try {
-            // Convert paste to string before encrypting it.
-            paste.text = CryptoJS.AES.encrypt(
-                JSON.stringify(paste.text), passphrase
-            ).toString();
-        } catch(err) {
-            console.log("Cannot recover from Encryption failure.", err);
-            noteAbovePasteBox.innerText = "Encryption failed.";
-            displayFailureNote();
-            return;
-        }
+        paste.text = encryptor(paste.text,passphrase)
+        console.log("encrypted Paste : ",paste)
         //Sending Paste to the server
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://18.116.44.211:3000/api/store");
+        xhr.open("POST", `http://${URL}:3000/api/store`);
         xhr.setRequestHeader('Content-Type','application/json')
         xhr.send(JSON.stringify(paste))
         xhr.onload = ()=>{
-            Pasteid = xhr.response;
+            let Pasteid = xhr.response;
             Pasteid = Pasteid.slice(1,Pasteid.length-1)
-            console.log("PasteID",Pasteid)
-
-            // Add ObjectID and passphrase to fragment url.
-            const pasteUrl = Pasteid+'#'+passphrase+'#server';
-            console.log("PasteUrl",pasteUrl)
-            noteAbovePasteBox.innerText = "Your paste is: ";
-        
-            // Update the URL.
-            window.location.hash = pasteUrl;
-            
-            // Inform user about the Paste.
-            link.setAttribute("href", "./#" + pasteUrl);
-            link.innerText = "#" + pasteUrl;
-
-            noteAbovePasteBox.appendChild(link);
-            console.log(link);
-            displaySuccessNote();
-
-            // Show rendered text.
-            pasteBox.style.display = "none";
-            pasteBoxRendered.style.display = "";
-            pasteBoxRendered.innerHTML = pasteBox.value;
+            console.log("PasteID",Pasteid) //T
+            // Passing ObjectID and passphrase to linkDisplay function.
+            linkDisplay(Pasteid,passphrase,true)
         }
         
     }
-    
     
 }
 
@@ -232,54 +309,17 @@ function initialize() {
     pasteBox.value = '';
 
     const fragment = window.location.hash.substr(1).split('#');
-    console.log(typeof(fragment))//T
-    console.log((fragment))//T
     // Paste & Encryption key in fragment URL.
     if (fragment.length === 2) {
         const encryptedText = fragment[0];
         const passphrase = fragment[1];
-
-        let paste;
-        try {
-            // Decrypt the text and parse it to get the paste structure.
-            const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
-            paste = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            console.log('Paste : ',paste)
-            console.log('Bytes : ',bytes)
-        } catch(err) {
-            console.log("Decryption failure.", err);
-            noteAbovePasteBox.innerText = "Decryption failure.";
-            displayFailureNote();
-            return;
-        }
+        let paste = decryptor(encryptedText,passphrase)
+        console.log("Decrypted Paste: ",paste)
 
         if (paste.compressed) {
-            try {
-                // Get the original Uint8Array generated by fflate by
-                // converting paste.text to Array. It was converted to
-                // string so the Array structure was not preserved.
-                const decompressed = fflate.decompressSync(
-                    base64ToUint8Array(paste.text)
-                );
-
-                // Store decompressed text.
-                paste.text = fflate.strFromU8(decompressed);
-            } catch(err) {
-                console.log("Decompression failure.", err);
-                noteAbovePasteBox.innerText = "Decompression failure.";
-                displayFailureNote();
-                return;
-            }
+            paste = decompressor(paste)
         }
-
-        // Update the text.
-        pasteBox.style.display = 'none';
-        pasteBoxRendered.style.display = '';
-        pasteBoxRendered.innerHTML = paste.text;
-
-        // Inform user about the paste.
-        noteAbovePasteBox.innerText = "Paste successfully decrypted.";
-        displaySuccessNote();
+        displayUpdate(paste);
     }
     else if (fragment.length === 3){
         if (fragment[2] == "server")
@@ -288,12 +328,12 @@ function initialize() {
             const PasteID = fragment[0];
             console.log(PasteID)
             const xhr = new XMLHttpRequest();
-            xhr.open("GET", `http://18.116.44.211:3000/api/GetPaste/${PasteID}`);
+            xhr.open("GET", `http://${URL}:3000/api/GetPaste/${PasteID}`);
             xhr.send();
             xhr.onload = ()=>{
-                const Paste = JSON.parse(xhr.response)
-                console.log(Paste)
-                if(Paste.message)
+                let paste = JSON.parse(xhr.response)
+                console.log(paste);
+                if(paste.message)
                 {
                     // Update the text.
                         pasteBox.style.display = 'none';
@@ -303,44 +343,15 @@ function initialize() {
                         displaySuccessNote();
                 }
                 else{
-
-                    try {
-                        // Decrypt the text and parse it to get the paste structure.
-                        const bytes = CryptoJS.AES.decrypt(Paste.PasteMsg, passphrase);
-                        Paste.PasteMsg = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-                    } catch(err) {
-                        console.log("Decryption failure.", err);
-                        noteAbovePasteBox.innerText = "Decryption failure.";
-                        displayFailureNote();
-                        return;
-                    }
-                    //Have to create pasteCompressedFunction 
-                    if (Paste.compressed) {
-                        try {
-                            // Get the original Uint8Array generated by fflate by
-                            // converting paste.text to Array. It was converted to
-                            // string so the Array structure was not preserved.
-                            const decompressed = fflate.decompressSync(
-                                base64ToUint8Array(Paste.PasteMsg)
-                                );
-                                
-                                // Store decompressed text.
-                                Paste.PasteMsg = fflate.strFromU8(decompressed);
-                            } catch(err) {
-                                console.log("Decompression failure.", err);
-                                noteAbovePasteBox.innerText = "Decompression failure.";
-                                displayFailureNote();
-                                return;
-                            }
-                        }
-                        // Update the text.
-                        pasteBox.style.display = 'none';
-                        pasteBoxRendered.style.display = '';
-                        pasteBoxRendered.innerHTML = Paste.PasteMsg;
                     
-                        // Inform user about the paste.
-                        noteAbovePasteBox.innerText = "Paste successfully decrypted.";
-                        displaySuccessNote();
+                    paste.text = decryptor(paste.text, passphrase);
+                    console.log("Paste Text : ",paste.text)
+                    //Have to create pasteCompressedFunction 
+                    if (paste.compressed) {
+                        paste = decompressor(paste);
+                        console.log("Paste Text after decompression: ",paste.text)
+                        }
+                        displayUpdate(paste);
                 }
                 }
         }

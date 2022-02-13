@@ -6,6 +6,12 @@
         <title>NoledgeBin</title>
         <!-- <link rel="icon" href="./resources/favicon.png" type="image/png"> -->
         <link rel="stylesheet" href="./resources/style.css">
+        <link rel="stylesheet" href=
+"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/styles/default.min.css">
+    <!-- Installing highlight.js through CDN -->
+    <script src=
+"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/highlight.min.js">
+    </script>
     </head>
     <body>
         <noscript>
@@ -20,6 +26,10 @@
             <input type="checkbox" id="hamburger"/>
 
             <div class="bottom" id="hamitems">
+                <div class="syntax-hl">
+                    <input type="checkbox" id="syntax-hl">
+                    <label for="serverless">Syntax Highlighter</label>
+                </div>
                 <div class="serverCheck">
                     <input type="checkbox" id="serverless">
                     <label for="serverless">Serverless Mode</label>

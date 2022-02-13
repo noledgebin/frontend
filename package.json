@@ -8,6 +8,7 @@
         "crypto-js": "^4.1.1",
         "crypto-random-string": "^4.0.0",
         "fflate": "^0.7.1",
+        "highlight.js": "^11.4.0",
         "regenerator-runtime": "^0.13.9"
     },
     "devDependencies": {
