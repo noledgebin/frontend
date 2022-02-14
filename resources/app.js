@@ -18,7 +18,7 @@ const pasteBox = document.getElementById('user-paste');
 const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
 const syntaxHl = document.getElementById("syntax-hl");
-
+let pasteText =''
 
 //hamitems
 const serverlessCheck = document.getElementById('serverless')
@@ -156,7 +156,7 @@ function encryptor(Content,passphrase){
         return encryptedText
     }
     
-    function linkDisplay(encryptedText,passphrase,server){
+function linkDisplay(encryptedText,passphrase,server){
     console.log(server)
     let pasteUrl
     if(server)
@@ -181,8 +181,10 @@ function encryptor(Content,passphrase){
     displaySuccessNote();
     
     // Show rendered text.
-    if(syntaxHl)
+    
+    if(syntaxHl.checked)
     {
+        console.log("syntaxHl ",syntaxHl.value)
         pasteBox.value = hljs.highlightAuto(pasteBox.value).value;
     }
     pasteBox.style.display = "none";
@@ -206,6 +208,7 @@ function decompressor(paste){
             displayFailureNote();
             return;
             }
+    pasteText = paste.text
     return paste
 }
 
@@ -227,6 +230,7 @@ function decryptor(encryptedText,passphrase){
 }
 function displayUpdate(paste){
     // Update the text.
+    console.log("pasteText for clone feature",pasteText)
     if(paste.syntaxHl)
     {
         paste.text = hljs.highlightAuto(paste.text).value;
@@ -251,9 +255,9 @@ window.newPaste = function newPaste() {
 window.clonePaste = function clonePaste() {
     // Remove fragment url.
     window.location.hash = '';
-
+    console.log("In clone function : ",pasteText)
     // Clone the paste in pasteBox.
-    pasteBox.value = pasteBoxRendered.innerHTML;
+    pasteBox.value = pasteText;
 
     // Show textarea.
     pasteBoxRendered.style.display = 'none';
@@ -273,6 +277,7 @@ window.sendPaste = function sendPaste() {
         "ExpireTime":expireVal(),
         "syntaxHl":syntaxHl.checked
     };
+    pasteText = paste.text;
     console.log(paste)
     if (paste.compressed) {
         paste.text = compressor(paste.text)
