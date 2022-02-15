@@ -150,7 +150,6 @@ function compressor(Content){
             Content.text = pasteBox.innerText;
             Content.compressed = false;
         }
-    console.log("Compressed Paste : ", Content)
     return Content
 }
 
@@ -180,8 +179,6 @@ function linkDisplay(encryptedText,passphrase,server){
     else{
         pasteUrl = encryptedText.concat("#", passphrase);
     }
-    console.log(pasteUrl); //T
-    console.log(encryptedText); //T
     noteAbovePasteBox.innerText = "Your paste is: ";
     window.location.hash = pasteUrl;
     
@@ -191,14 +188,10 @@ function linkDisplay(encryptedText,passphrase,server){
     link.innerText = "#" + pasteUrl;
     
     noteAbovePasteBox.appendChild(link);
-    console.log(link);
     displaySuccessNote();
-    
     // Show rendered text.
-    
     if(syntaxHl.checked)
     {
-        console.log("syntaxHl ",syntaxHl.value)
         pasteBox.value = hljs.highlightAuto(pasteBox.value).value;
     }
     pasteBox.style.display = "none";
@@ -289,7 +282,6 @@ window.sendPaste = function sendPaste() {
         "syntaxHl":syntaxHl.checked
     };
     pasteText = paste.text;
-    console.log(paste)
     if (paste.compressed) {
         paste.text = compressor(paste.text)
     }
@@ -301,7 +293,6 @@ window.sendPaste = function sendPaste() {
     }
     else {
         paste.text = encryptor(paste.text,passphrase)
-        console.log("encrypted Paste : ",paste)
         //Sending Paste to the server
         const xhr = new XMLHttpRequest();
         xhr.open("POST", `http://${URL}:3000/api/store`);
@@ -310,7 +301,6 @@ window.sendPaste = function sendPaste() {
         xhr.onload = ()=>{
             let Pasteid = xhr.response;
             Pasteid = Pasteid.slice(1,Pasteid.length-1)
-            console.log("PasteID",Pasteid) //T
             // Passing ObjectID and passphrase to linkDisplay function.
             linkDisplay(Pasteid,passphrase,true)
         }
