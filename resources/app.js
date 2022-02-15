@@ -16,8 +16,6 @@ const noteAbovePasteBox = document.getElementById('note-above-paste-box');
 const syntaxHl = document.getElementById("syntax-hl");
 let pasteText =''
 const copyButton = document.getElementById("user-paste-clipboard");
-const copySuccess = document.getElementById("clipboard-success");
-
 
 //hamitems
 const serverlessCheck = document.getElementById('serverless')
@@ -25,7 +23,7 @@ const expireTime = document.getElementById("expires-time");
 const BurnAfterRead = document.getElementById("burnAfterRead");
 const Passwd = document.getElementById("Passwd");
 
-let URL = "localhost" //Temp
+let URL = "localhost" //Temp--Public ip address
 
 //If the backend isn't responding then automatically switch to serverless mode.
 function goingServerless(){
@@ -43,7 +41,6 @@ xhr.onerror = (e)=>{
 }
 xhr.onload = ()=>{
     let res = xhr.response
-    console.log(res)
     if(res != 'OK')
         goingServerless()
 }
@@ -125,10 +122,10 @@ copyButton.addEventListener("click", ()=>{
     document.execCommand('copy');
     document.body.removeChild(element);
 
-    copySuccess.classList.add("show-message");
+    copyButton.innerText = "Copied";
     console.log(copyButton)
     setTimeout(()=>{
-        copySuccess.classList.remove("show-message");
+        copyButton.innerText = "Copy";
         console.log(copyButton)
         console.log("show-message removed")
     },2500)
@@ -235,8 +232,6 @@ function decryptor(encryptedText,passphrase){
             // Decrypt the text and parse it to get the paste structure.
             const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
             DencryptedText = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            console.log("Paste : ", DencryptedText);
-            console.log('Bytes : ',bytes)
         } catch(err) {
             console.log("Decryption failure.", err);
             noteAbovePasteBox.innerText = "Decryption failure.";
@@ -247,7 +242,6 @@ function decryptor(encryptedText,passphrase){
 }
 function displayUpdate(paste){
     // Update the text.
-    console.log("pasteText for clone feature",pasteText)
     if(paste.syntaxHl)
     {
         paste.text = hljs.highlightAuto(paste.text).value;
@@ -298,7 +292,6 @@ window.sendPaste = function sendPaste() {
     console.log(paste)
     if (paste.compressed) {
         paste.text = compressor(paste.text)
-        // console.log("Compressed Paste :",paste.text)
     }
 
     if(serverlessCheck.checked)
@@ -348,19 +341,17 @@ function initialize() {
         {
             const passphrase = fragment[1];
             const PasteID = fragment[0];
-            console.log(PasteID)
             const xhr = new XMLHttpRequest();
             xhr.open("GET", `http://${URL}:3000/api/GetPaste/${PasteID}`);
             xhr.send();
             xhr.onload = ()=>{
                 let paste = JSON.parse(xhr.response)
-                console.log(paste);
                 if(paste.message)
                 {
                     // Update the text.
                         pasteBox.style.display = 'none';
                         pasteBoxRendered.style.display = '';
-                        pasteBoxRendered.innerHTML = "😅";
+                        pasteBoxRendered.innerHTML = "(*￣3￣)╭";
                         noteAbovePasteBox.innerText = "Paste not found!"
                         displaySuccessNote();
                 }
@@ -368,7 +359,6 @@ function initialize() {
                     
                     paste.text = decryptor(paste.text, passphrase);
                     console.log("Paste Text : ",paste.text)
-                    //Have to create pasteCompressedFunction 
                     if (paste.compressed) {
                         paste = decompressor(paste);
                         console.log("Paste Text after decompression: ",paste.text)

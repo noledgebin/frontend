@@ -229,6 +229,7 @@ pre {
 #clipboard-success.show-message{
     display:inline;
 }
+
 #top-nav-bar {
     background-color: var(--bg-dim);
     margin: 1ch 0;
