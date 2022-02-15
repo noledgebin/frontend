@@ -9,16 +9,15 @@ import 'regenerator-runtime/runtime';
 import cryptoRandomString from 'crypto-random-string';
 import hljs from 'highlight.js';
 
-//text highlighter 
-// hljs = require("highlight.js");
-// hljs.highlightAuto("<h1>Hello World!</h1>").value;
-
 // Paste Elements.
 const pasteBox = document.getElementById('user-paste');
 const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
 const syntaxHl = document.getElementById("syntax-hl");
 let pasteText =''
+const copyButton = document.getElementById("user-paste-clipboard");
+const copySuccess = document.getElementById("clipboard-success");
+
 
 //hamitems
 const serverlessCheck = document.getElementById('serverless')
@@ -115,7 +114,25 @@ function displayFailureNote() {
     noteAbovePasteBox.classList.remove("success");
     noteAbovePasteBox.style.display = '';
 }
+//copying the decrypted paste to the clipboard
+copyButton.addEventListener("click", ()=>{
+    console.log('copybutton pressed')
+    const text = pasteText;
+    let element = document.createElement('textarea');
+    document.body.appendChild(element);
+    element.value = text;
+    element.select();
+    document.execCommand('copy');
+    document.body.removeChild(element);
 
+    copySuccess.classList.add("show-message");
+    console.log(copyButton)
+    setTimeout(()=>{
+        copySuccess.classList.remove("show-message");
+        console.log(copyButton)
+        console.log("show-message removed")
+    },2500)
+});
 function compressor(Content){
     try {
             const buf = fflate.strToU8(Content);

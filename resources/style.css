@@ -193,6 +193,42 @@ pre {
     border: 1px solid var(--bg-hl-alt-intense);
 }
 
+.user-paste-render-container{
+    position: relative;
+}
+#user-paste-clipboard {
+    position: absolute;
+    top:9px;
+    right:9px;
+    background: var(--cyan-subtle-bg);
+    border :1px solid;
+    outline: none;
+    padding:5px 7px;
+    cursor: pointer;
+    transition: all 0.1s ease-in;
+    opacity:0;
+}
+#user-paste-clipboard:hover{
+    background-color: var(--blue-subtle-bg);
+}
+.user-paste-render-container:hover #user-paste-clipboard{
+    opacity: 1;
+}
+
+#clipboard-success{
+    position: relative;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--green-subtle-bg);
+    padding: 5px 7px;
+    border-radius: 5px;
+    display: none;
+}
+
+#clipboard-success.show-message{
+    display:inline;
+}
 #top-nav-bar {
     background-color: var(--bg-dim);
     margin: 1ch 0;
@@ -204,6 +240,7 @@ pre {
     margin: 1ch 0;
     border: 1px solid var(--fg-alt);
 }
+
 /* Override send button styles */
 #send-button {
     background-color: var(--cyan-subtle-bg) !important;
