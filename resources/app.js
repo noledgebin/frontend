@@ -50,7 +50,6 @@ xhr.onload = ()=>{
 serverlessCheck.addEventListener('click',()=>{
     if(serverlessCheck.checked)
     {
-        console.log(serverlessCheck.checked)
         expireTime.value = 'never';
         BurnAfterRead.checked = false;
         Passwd.checked = false;
@@ -64,7 +63,6 @@ serverlessCheck.addEventListener('click',()=>{
         Passwd.disabled = false
         
     }
-    console.log(expireTime.value)
 })
 
 //Disabling Expiry Time when BurnAfterRead is checked.
@@ -113,7 +111,6 @@ function displayFailureNote() {
 }
 //copying the decrypted paste to the clipboard
 copyButton.addEventListener("click", ()=>{
-    console.log('copybutton pressed')
     const text = pasteText;
     let element = document.createElement('textarea');
     document.body.appendChild(element);
@@ -123,11 +120,8 @@ copyButton.addEventListener("click", ()=>{
     document.body.removeChild(element);
 
     copyButton.innerText = "Copied";
-    console.log(copyButton)
     setTimeout(()=>{
         copyButton.innerText = "Copy";
-        console.log(copyButton)
-        console.log("show-message removed")
     },2500)
 });
 function compressor(Content){
@@ -170,7 +164,6 @@ function encryptor(Content,passphrase){
     }
     
 function linkDisplay(encryptedText,passphrase,server){
-    console.log(server)
     let pasteUrl
     if(server)
     {
@@ -259,7 +252,7 @@ window.newPaste = function newPaste() {
 window.clonePaste = function clonePaste() {
     // Remove fragment url.
     window.location.hash = '';
-    console.log("In clone function : ",pasteText)
+    
     // Clone the paste in pasteBox.
     pasteBox.value = pasteText;
 
@@ -319,7 +312,6 @@ function initialize() {
         const encryptedText = fragment[0];
         const passphrase = fragment[1];
         let paste = decryptor(encryptedText,passphrase)
-        console.log("Decrypted Paste: ",paste)
 
         if (paste.compressed) {
             paste = decompressor(paste)
@@ -348,10 +340,8 @@ function initialize() {
                 else{
                     
                     paste.text = decryptor(paste.text, passphrase);
-                    console.log("Paste Text : ",paste.text)
                     if (paste.compressed) {
                         paste = decompressor(paste);
-                        console.log("Paste Text after decompression: ",paste.text)
                         }
                         displayUpdate(paste);
                 }
