@@ -26,10 +26,10 @@
             <input type="checkbox" id="hamburger"/>
 
             <div class="bottom" id="hamitems">
-                <div class="syntax-hl">
+                <!-- <div class="syntax-hl">
                     <input type="checkbox" id="syntax-hl">
                     <label for="syntax-hl">Syntax Highlighter</label>
-                </div>
+                </div> -->
                 <div class="serverCheck">
                     <input type="checkbox" id="serverless">
                     <label for="serverless">Serverless Mode</label>
@@ -41,8 +41,23 @@
                 <div class="Passwd">
                     <input type="checkbox" id="Passwd">
                     <label for="Passwd">Password</label>
-
                 </div>
+                <div class="Select-syntax-expiry">
+                <div class="syntax-hl">
+                    <label for="syntax-hl">Syntax: </label>
+                    <select name="syntax-hl" id="syntax">
+                        <option value="plaintext" >None</option>
+                        <option value="python">Python</option>
+                        <option value="c">C</option>
+                        <option value="c++">C++</option>
+                        <option value="javascript">Javascript</option>
+                        <option value="HTML">HTML</option>
+                        <option value="java">Java</option>
+                        <option value="c#">C#</option>
+                        <option value="go">Go</option>
+                    </select>
+                </div>
+                
                 <div class="expires">
                     <label for="expiry-time">Expires: </label>
                     <select name="expires-time" id="expires-time">
@@ -56,7 +71,7 @@
                         <option value="1yr">1 year</option>
                     </select>
                 </div>
-
+                </div>
             </div>
         </div>
 

@@ -127,11 +127,15 @@ body { line-height: 1.5; }
 
 .sidebar h1 { text-align: center; }
 
-.sidebar .expires {
+.sidebar .Select-syntax-expiry {
     background-color: var(--bg-main);
     color: var(--fg-special-mild);
     width: 100%;
     padding: 10px;
+}
+
+.syntax-hl{
+    margin: 10px;
 }
 
 .sidebar select {

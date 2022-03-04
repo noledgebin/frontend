@@ -13,8 +13,10 @@ import hljs from 'highlight.js';
 const pasteBox = document.getElementById('user-paste');
 const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
-const syntaxHl = document.getElementById("syntax-hl");
-let pasteText =''
+// const syntaxHl = document.getElementById("syntax-hl");
+const syntaxHl_1 = document.getElementById("syntax");
+let pasteTextWithHljs =''
+let pasteTextNoHljs 
 const copyButton = document.getElementById("user-paste-clipboard");
 
 //hamitems
@@ -26,24 +28,24 @@ const Passwd = document.getElementById("Passwd");
 let URL = "localhost" //Temp--Public ip address
 
 //If the backend isn't responding then automatically switch to serverless mode.
-function goingServerless(){
-    alert("Backend is down, switching to server-less mode");
-    window.location.hash = "";
-    serverlessCheck.click();
-    serverlessCheck.disabled = true;
-}
+// function goingServerless(){
+//     alert("Backend is down, switching to server-less mode");
+//     window.location.hash = "";
+//     serverlessCheck.click();
+//     serverlessCheck.disabled = true;
+// }
 
-const xhr = new XMLHttpRequest();
-xhr.open("GET", `http://${URL}:3000/api/`);
-xhr.send()
-xhr.onerror = (e)=>{
-    goingServerless()
-}
-xhr.onload = ()=>{
-    let res = xhr.response
-    if(res != 'OK')
-        goingServerless()
-}
+// const xhr = new XMLHttpRequest();
+// xhr.open("GET", `http://${URL}:3000/api/`);
+// xhr.send()
+// xhr.onerror = (e)=>{
+//     goingServerless()
+// }
+// xhr.onload = ()=>{
+//     let res = xhr.response
+//     if(res != 'OK')
+//         goingServerless()
+// }
 //---
 
 //Disabling other features when serverless mode is checked
@@ -111,7 +113,7 @@ function displayFailureNote() {
 }
 //copying the decrypted paste to the clipboard
 copyButton.addEventListener("click", ()=>{
-    const text = pasteText;
+    const text = pasteTextNoHljs;
     let element = document.createElement('textarea');
     document.body.appendChild(element);
     element.value = text;
@@ -124,6 +126,8 @@ copyButton.addEventListener("click", ()=>{
         copyButton.innerText = "Copy";
     },2500)
 });
+
+
 function compressor(Content){
     try {
             const buf = fflate.strToU8(Content);
@@ -163,7 +167,9 @@ function encryptor(Content,passphrase){
         return encryptedText
     }
     
-function linkDisplay(encryptedText,passphrase,server){
+//Display after the paste is sent
+function linkDisplay(encryptedText,passphrase,server,HLJS,pasteText){
+    console.log(pasteText)
     let pasteUrl
     if(server)
     {
@@ -183,13 +189,17 @@ function linkDisplay(encryptedText,passphrase,server){
     noteAbovePasteBox.appendChild(link);
     displaySuccessNote();
     // Show rendered text.
-    if(syntaxHl.checked)
-    {
-        pasteBox.value = hljs.highlightAuto(pasteBox.value).value;
-    }
+    //selectbox Highlight
+    console.log("Language : ",HLJS);
+    pasteTextWithHljs,pasteTextNoHljs = pasteText;
+    pasteTextWithHljs = hljs.highlight(pasteText, { language: HLJS }).value;
+    console.log("PasteText : ",JSON.stringify(pasteText));
+    console.log("pasteTextWithHljs : ", JSON.stringify(pasteTextWithHljs));
+    console.log("pasteTextNoHljs : ", pasteTextNoHljs);
+        
     pasteBox.style.display = "none";
     pasteBoxRendered.style.display = "";
-    pasteBoxRendered.innerHTML = pasteBox.value;
+    pasteBoxRendered.innerHTML = pasteTextWithHljs;
 }
 function decompressor(paste){
     try {
@@ -208,7 +218,10 @@ function decompressor(paste){
             displayFailureNote();
             return;
             }
-    pasteText = paste.text
+    pasteTextWithHljs = paste.text;
+    pasteTextNoHljs = paste.text;
+    console.log("pasteTextWithHljs", pasteTextWithHljs);
+    console.log("pasteTextWithHljs", pasteTextWithHljs);
     return paste
 }
 
@@ -224,17 +237,20 @@ function decryptor(encryptedText,passphrase){
             displayFailureNote();
             return;
         }
+    pasteTextWithHljs,pasteTextNoHljs = DencryptedText;
+    console.log("After Decryption pasteTextWithHljs : ", pasteTextWithHljs,"After Decryption pasteTextNoHljs : ", pasteTextNoHljs);
     return DencryptedText;
 }
 function displayUpdate(paste){
     // Update the text.
-    if(paste.syntaxHl)
-    {
-        paste.text = hljs.highlightAuto(paste.text).value;
-    }
+    pasteTextWithHljs, (pasteTextNoHljs = paste.text);
+    pasteTextWithHljs = hljs.highlight(paste.text, { language: paste.syntaxHl }).value;
+    console.log("pasteTextWithHljs : ", JSON.stringify(pasteTextWithHljs));
+    console.log("pasteTextNoHljs : ", pasteTextNoHljs);
+
     pasteBox.style.display = 'none';
     pasteBoxRendered.style.display = '';
-    pasteBoxRendered.innerHTML = paste.text;
+    pasteBoxRendered.innerHTML = pasteTextWithHljs;
     // Inform user about the paste.
     noteAbovePasteBox.innerText = "Paste successfully decrypted.";
     displaySuccessNote();
@@ -254,8 +270,8 @@ window.clonePaste = function clonePaste() {
     window.location.hash = '';
     
     // Clone the paste in pasteBox.
-    pasteBox.value = pasteText;
-
+    pasteBox.value = pasteTextNoHljs;
+    console.log("pasteTextNoHljs in Clone section : ", pasteTextNoHljs);
     // Show textarea.
     pasteBoxRendered.style.display = 'none';
     pasteBox.style.display = '';
@@ -266,19 +282,29 @@ window.clonePaste = function clonePaste() {
 
 // sendPaste reads data from pasteBox and acts on it.
 window.sendPaste = function sendPaste() {
+    
+    //user-paste
     const passphrase = cryptoRandomString({length: 32, type: 'url-safe'});
     let paste = {
         "text": pasteBox.value,
         "compressed": pasteBox.value.length <= 72 ? false : true,
         "BurnAfterRead": BurnAfterRead.checked,
         "ExpireTime":expireVal(),
-        "syntaxHl":syntaxHl.checked
+        "syntaxHl":syntaxHl_1.value
     };
-    pasteText = paste.text;
+    console.log(Boolean(pasteTextNoHljs))
+    if(pasteTextNoHljs)
+    {
+        paste.text = pasteTextNoHljs
+        console.log("Paste.text = ",paste.text)
+    }
+    let pasteText = paste.text //temp var
+    console.log('Paste before encryption  : ',paste);
+
     if (paste.compressed) {
         paste.text = compressor(paste.text)
     }
-
+    //---
     if(serverlessCheck.checked)
     {
         let encryptedText = encryptor(paste,passphrase)
@@ -290,12 +316,14 @@ window.sendPaste = function sendPaste() {
         const xhr = new XMLHttpRequest();
         xhr.open("POST", `http://${URL}:3000/api/store`);
         xhr.setRequestHeader('Content-Type','application/json')
+        console.log("Paste after encrpytion : ",paste)
         xhr.send(JSON.stringify(paste))
         xhr.onload = ()=>{
+            // console.log('Response from the server: ',xhr.response)
             let Pasteid = xhr.response;
             Pasteid = Pasteid.slice(1,Pasteid.length-1)
-            // Passing ObjectID and passphrase to linkDisplay function.
-            linkDisplay(Pasteid,passphrase,true)
+            // Passing ObjectID , passphrase ,severMode ,syntax Highlight and pastetext for display to linkDisplay function.
+            linkDisplay(Pasteid, passphrase, true, paste.syntaxHl, pasteText);
         }
         
     }
