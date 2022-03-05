@@ -23,8 +23,8 @@ const copyButton = document.getElementById("user-paste-clipboard");
 const serverlessCheck = document.getElementById('serverless')
 const expireTime = document.getElementById("expires-time");
 const BurnAfterRead = document.getElementById("burnAfterRead");
-const Passwd = document.getElementById("Passwd");
-
+const Passwd = document.querySelector(".PasswdContainer");
+const PasswdCheck = document.getElementById("Passwd")
 let URL = "localhost" //Temp--Public ip address
 
 //If the backend isn't responding then automatically switch to serverless mode.
@@ -127,9 +127,26 @@ copyButton.addEventListener("click", ()=>{
     },2500)
 });
 
+//password section
+const passwdText = document.createElement("input");
+passwdText.setAttribute("type", "password");
+passwdText.classList.add("passwdTextArea");
+
+PasswdCheck.addEventListener('click',()=>{
+    console.log('clicked')
+    if(PasswdCheck.checked){
+        console.log(Passwd);
+        Passwd.appendChild(passwdText)
+    }
+    else{
+        Passwd.removeChild(passwdText)
+    }
+    
+})
 
 function compressor(Content){
     try {
+        console.log("Under compression")
             const buf = fflate.strToU8(Content);
 
             // Increasing mem may increase performance at the cost of
@@ -196,7 +213,7 @@ function linkDisplay(encryptedText,passphrase,server,HLJS,pasteText){
     console.log("PasteText : ",JSON.stringify(pasteText));
     console.log("pasteTextWithHljs : ", JSON.stringify(pasteTextWithHljs));
     console.log("pasteTextNoHljs : ", pasteTextNoHljs);
-        
+
     pasteBox.style.display = "none";
     pasteBoxRendered.style.display = "";
     pasteBoxRendered.innerHTML = pasteTextWithHljs;
@@ -290,7 +307,8 @@ window.sendPaste = function sendPaste() {
         "compressed": pasteBox.value.length <= 72 ? false : true,
         "BurnAfterRead": BurnAfterRead.checked,
         "ExpireTime":expireVal(),
-        "syntaxHl":syntaxHl_1.value
+        "syntaxHl":syntaxHl_1.value,
+        "pass" : PasswdCheck.checked === true ? passwdText.value : false
     };
     console.log(Boolean(pasteTextNoHljs))
     if(pasteTextNoHljs)
@@ -346,7 +364,7 @@ function initialize() {
         }
         displayUpdate(paste);
     }
-    else if (fragment.length === 3){
+    else {
         if (fragment[2] == "server")
         {
             const passphrase = fragment[1];
