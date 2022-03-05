@@ -57,12 +57,12 @@ serverlessCheck.addEventListener('click',()=>{
         Passwd.checked = false;
         expireTime.disabled = true;
         BurnAfterRead.disabled = true;
-        Passwd.disabled = true
+        PasswdCheck.disabled = true;
     }
     else{
         expireTime.disabled = false;
         BurnAfterRead.disabled = false;
-        Passwd.disabled = false
+        PasswdCheck.disabled = false;
         
     }
 })
@@ -185,12 +185,13 @@ function encryptor(Content,passphrase){
     }
     
 //Display after the paste is sent
-function linkDisplay(encryptedText,passphrase,server,HLJS,pasteText){
+function linkDisplay(encryptedText,passphrase,server,HLJS,pasteText,Passwd){
     console.log(pasteText)
     let pasteUrl
     if(server)
     {
         pasteUrl = encryptedText+"#"+passphrase+"#server";
+        pasteUrl = Passwd != false ? pasteUrl + "#P" : pasteUrl;
     }
     else{
         pasteUrl = encryptedText.concat("#", passphrase);
@@ -246,6 +247,7 @@ function decryptor(encryptedText,passphrase){
     let DencryptedText;
         try {
             // Decrypt the text and parse it to get the paste structure.
+            console.log(encryptedText,passphrase)
             const bytes = CryptoJS.AES.decrypt(encryptedText, passphrase);
             DencryptedText = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         } catch(err) {
@@ -308,14 +310,14 @@ window.sendPaste = function sendPaste() {
         "BurnAfterRead": BurnAfterRead.checked,
         "ExpireTime":expireVal(),
         "syntaxHl":syntaxHl_1.value,
-        "pass" : PasswdCheck.checked === true ? passwdText.value : false
+        "passwd" : PasswdCheck.checked === true ? passwdText.value : '',
     };
     console.log(Boolean(pasteTextNoHljs))
-    if(pasteTextNoHljs)
-    {
-        paste.text = pasteTextNoHljs
-        console.log("Paste.text = ",paste.text)
-    }
+    // if(pasteTextNoHljs)
+    // {
+    //     paste.text = pasteTextNoHljs
+    //     console.log("Paste.text = ",paste.text)
+    // }
     let pasteText = paste.text //temp var
     console.log('Paste before encryption  : ',paste);
 
@@ -326,7 +328,7 @@ window.sendPaste = function sendPaste() {
     if(serverlessCheck.checked)
     {
         let encryptedText = encryptor(paste,passphrase)
-        linkDisplay(encryptedText,passphrase)
+        linkDisplay(encryptedText,passphrase,false, paste.syntaxHl, pasteText)
     }
     else {
         paste.text = encryptor(paste.text,passphrase)
@@ -341,7 +343,7 @@ window.sendPaste = function sendPaste() {
             let Pasteid = xhr.response;
             Pasteid = Pasteid.slice(1,Pasteid.length-1)
             // Passing ObjectID , passphrase ,severMode ,syntax Highlight and pastetext for display to linkDisplay function.
-            linkDisplay(Pasteid, passphrase, true, paste.syntaxHl, pasteText);
+            linkDisplay(Pasteid, passphrase, true, paste.syntaxHl, pasteText,paste.passwd);
         }
         
     }
@@ -358,7 +360,7 @@ function initialize() {
         const encryptedText = fragment[0];
         const passphrase = fragment[1];
         let paste = decryptor(encryptedText,passphrase)
-
+        
         if (paste.compressed) {
             paste = decompressor(paste)
         }
@@ -370,11 +372,30 @@ function initialize() {
             const passphrase = fragment[1];
             const PasteID = fragment[0];
             const xhr = new XMLHttpRequest();
-            xhr.open("GET", `http://${URL}:3000/api/GetPaste/${PasteID}`);
-            xhr.send();
+            if(fragment[3] == "P")
+            {
+                let userGivenPass = prompt("Enter the Password here");
+                xhr.open("POST", `http://${URL}:3000/api/GetPaste/${PasteID}`);
+                xhr.setRequestHeader('Content-Type','application/json')
+                console.log(userGivenPass)
+                xhr.send(JSON.stringify({passwd:`${userGivenPass}`}));
+            }
+            else{
+                xhr.open("GET", `http://${URL}:3000/api/GetPaste/${PasteID}`);
+                xhr.send();
+            }
             xhr.onload = ()=>{
                 let paste = JSON.parse(xhr.response)
-                if(paste.message)
+                console.log(paste)
+                if (paste.error)
+                {
+                    pasteBox.style.display = "none";
+                    pasteBoxRendered.style.display = "";
+                    pasteBoxRendered.innerHTML = "ಠ_ಠ";
+                    noteAbovePasteBox.innerText = paste.error;
+                    displayFailureNote();
+                }
+                else if (paste.message)
                 {
                     // Update the text.
                         pasteBox.style.display = 'none';
@@ -384,7 +405,7 @@ function initialize() {
                         displaySuccessNote();
                 }
                 else{
-                    
+                    console.log(paste.text)
                     paste.text = decryptor(paste.text, passphrase);
                     if (paste.compressed) {
                         paste = decompressor(paste);
