@@ -15,8 +15,13 @@ const pasteBoxRendered = document.getElementById('user-paste-rendered');
 const noteAbovePasteBox = document.getElementById('note-above-paste-box');
 // const syntaxHl = document.getElementById("syntax-hl");
 const syntaxHl_1 = document.getElementById("syntax");
+
+//Variable for storing highlighted text Eg(<span class=\"hljs-built_in\">print</span>(<span class=\"hljs-string\">&quot;Hello world&quot;</span>))
+
 let pasteTextWithHljs =''
-let pasteTextNoHljs 
+
+//Variable for storing Orginal text (NoHighlight)  Eg(print("Hello world"))
+let pasteTextNoHljs = ''
 const copyButton = document.getElementById("user-paste-clipboard");
 
 //hamitems
@@ -25,7 +30,7 @@ const expireTime = document.getElementById("expires-time");
 const BurnAfterRead = document.getElementById("burnAfterRead");
 const Passwd = document.querySelector(".PasswdContainer");
 const PasswdCheck = document.getElementById("Passwd")
-let URL = "localhost" //Temp--Public ip address
+let URL = "localhost" //Temp--Public ip address--AWS EC2
 
 //If the backend isn't responding then automatically switch to serverless mode.
 // function goingServerless(){
@@ -184,6 +189,7 @@ function encryptor(Content,passphrase){
         return encryptedText
     }
     
+
 //Display after the paste is sent
 function linkDisplay(encryptedText,passphrase,server,HLJS,pasteText,Passwd){
     console.log(pasteText)
@@ -312,19 +318,22 @@ window.sendPaste = function sendPaste() {
         "syntaxHl":syntaxHl_1.value,
         "passwd" : PasswdCheck.checked === true ? passwdText.value : '',
     };
-    console.log(Boolean(pasteTextNoHljs))
+    
+    //Creates a bug ↓
     // if(pasteTextNoHljs)
     // {
     //     paste.text = pasteTextNoHljs
     //     console.log("Paste.text = ",paste.text)
     // }
-    let pasteText = paste.text //temp var
+
+    let pasteText = paste.text 
     console.log('Paste before encryption  : ',paste);
 
     if (paste.compressed) {
         paste.text = compressor(paste.text)
     }
     //---
+
     if(serverlessCheck.checked)
     {
         let encryptedText = encryptor(paste,passphrase)
